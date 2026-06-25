@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Bash(npm create *)",
+      "mcp__Claude_Preview__preview_start",
+      "PowerShell(Get-Process node -ErrorAction SilentlyContinue | Where-Object { $_.Id -eq 6312 } | Stop-Process -Force; Start-Sleep 1; Write-Output \"Done\")",
+      "PowerShell(netstat -ano)",
+      "Bash(git --version)",
+      "Bash(gh --version)",
+      "Bash(git -C D:/ARIALBLACK config user.name)",
+      "Bash(git -C D:/ARIALBLACK config user.email)"
+    ]
+  }
+}
