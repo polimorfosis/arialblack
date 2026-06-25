@@ -1,54 +1,68 @@
-import { useState } from 'react'
-
 const FX = [
-  { id: 'drive', label: 'DRIVE', led: '#ff4400', desc: 'OD' },
-  { id: 'fuzz',  label: 'FUZZ',  led: '#ff00cc', desc: 'FZ' },
+  { id: 'drive', label: 'DRIVE', led: '#ff4400' },
+  { id: 'fuzz',  label: 'FUZZ',  led: '#ff00cc' },
 ]
 
 export default function FxButtons({ active, onToggle }) {
   return (
-    <div className="flex gap-6 items-center justify-center">
+    <div className="flex gap-5 items-center justify-center">
       {FX.map(fx => {
         const isOn = active[fx.id]
         return (
-          <button
-            key={fx.id}
-            className="mech-btn rounded-full w-16 h-16 flex flex-col items-center justify-center gap-1 outline-none"
-            onPointerDown={(e) => { e.preventDefault(); onToggle(fx.id) }}
-            style={{ WebkitTapHighlightColor: 'transparent', touchAction: 'manipulation' }}
-          >
-            {/* LED */}
-            <div
+          <div key={fx.id} className="flex flex-col items-center gap-1.5">
+            {/* LED de estado */}
+            <div style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              background: isOn ? fx.led : '#222',
+              border: `1px solid ${isOn ? fx.led : '#444'}`,
+              boxShadow: isOn ? `0 0 8px 2px ${fx.led}` : 'none',
+              transition: 'all 100ms ease',
+            }} />
+
+            {/* Botón estilo footswitch compacto */}
+            <button
+              className="fx-btn rounded-full outline-none flex flex-col items-center justify-center gap-0.5"
+              onPointerDown={(e) => { e.preventDefault(); onToggle(fx.id) }}
               style={{
-                width: '10px',
-                height: '10px',
-                borderRadius: '50%',
-                background: isOn ? fx.led : 'rgba(255,255,255,0.1)',
-                boxShadow: isOn ? `0 0 8px ${fx.led}, 0 0 16px ${fx.led}` : 'none',
-                transition: 'all 100ms ease',
+                width: '52px',
+                height: '52px',
+                WebkitTapHighlightColor: 'transparent',
+                touchAction: 'manipulation',
               }}
-            />
-            <span
-              className="text-[10px] tracking-widest uppercase font-bold"
-              style={{
+            >
+              {/* Mini ícono de efecto */}
+              <div style={{
+                fontSize: '14px',
+                lineHeight: 1,
+                filter: isOn ? `drop-shadow(0 0 4px ${fx.led})` : 'none',
+              }}>
+                {fx.id === 'drive' ? '⚡' : '〰'}
+              </div>
+              <span style={{
                 fontFamily: "'Share Tech Mono', monospace",
-                color: isOn ? fx.led : 'rgba(255,255,255,0.35)',
+                fontSize: '9px',
+                letterSpacing: '0.15em',
+                color: isOn ? fx.led : 'rgba(255,255,255,0.3)',
                 textShadow: isOn ? `0 0 6px ${fx.led}` : 'none',
                 transition: 'all 100ms ease',
-              }}
-            >
-              {fx.label}
-            </span>
-            <span
-              className="text-[8px]"
-              style={{
-                fontFamily: "'Share Tech Mono', monospace",
-                color: isOn ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.15)',
-              }}
-            >
+                textTransform: 'uppercase',
+              }}>
+                {fx.label}
+              </span>
+            </button>
+
+            {/* Estado ON/OFF */}
+            <div style={{
+              fontFamily: "'Share Tech Mono', monospace",
+              fontSize: '8px',
+              color: isOn ? fx.led : 'rgba(255,255,255,0.2)',
+              letterSpacing: '0.1em',
+            }}>
               {isOn ? '■ ON' : '□ OFF'}
-            </span>
-          </button>
+            </div>
+          </div>
         )
       })}
     </div>
