@@ -36,35 +36,104 @@ body::before {
 }
 
 /* ==========================================
-   PEDAL BODY — inspirado en BOSS SD-1
+   PEDAL BODY — inspirado en BOSS SD-1, usado
    ========================================== */
 
 .pedal-body {
   position: relative;
-  background: linear-gradient(160deg, #d4830a 0%, #b86a05 40%, #c97808 70%, #a05504 100%);
+  /* Base de metal expuesto (color más oscuro) que asoma bajo la pintura */
+  background:
+    /* Pintura naranja principal con irregularidades */
+    radial-gradient(ellipse 60% 30% at 30% 20%, #c97808 0%, transparent 100%),
+    radial-gradient(ellipse 80% 60% at 70% 60%, #d4830a 0%, transparent 100%),
+    radial-gradient(ellipse 40% 40% at 85% 15%, #b86a05 0%, transparent 100%),
+    linear-gradient(155deg, #c97808 0%, #a85e04 45%, #bf7006 75%, #9a5203 100%);
   border-radius: 14px;
   box-shadow:
-    0 8px 32px rgba(0,0,0,0.7),
+    0 8px 32px rgba(0,0,0,0.75),
     0 2px 6px rgba(0,0,0,0.5),
-    inset 0 1px 0 rgba(255,200,80,0.25),
-    inset 0 -2px 4px rgba(0,0,0,0.3);
-  border: 2px solid #7a4002;
+    inset 0 1px 0 rgba(255,200,80,0.2),
+    inset 0 -2px 4px rgba(0,0,0,0.35);
+  border: 2px solid #6a3800;
 }
 
-/* Textura metálica sutil en el cuerpo */
+/* Capa de desgaste: rayones, manchas y pintura saltada */
 .pedal-body::before {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: 12px;
-  background: repeating-linear-gradient(
-    90deg,
-    transparent,
-    transparent 3px,
-    rgba(0,0,0,0.04) 3px,
-    rgba(0,0,0,0.04) 4px
-  );
   pointer-events: none;
+  z-index: 1;
+  background:
+    /* Chip grande esquina superior izquierda */
+    radial-gradient(ellipse 22px 14px at 18% 8%, #3a2800 0%, #5a3c00 40%, transparent 70%),
+    /* Chip mediano borde derecho */
+    radial-gradient(ellipse 14px 20px at 94% 38%, #2e1e00 0%, #4a3200 35%, transparent 65%),
+    /* Chip pequeño esquina inferior derecha */
+    radial-gradient(ellipse 16px 10px at 88% 91%, #3a2800 0%, #5a3c00 45%, transparent 70%),
+    /* Desvanecimiento esquina inferior izquierda */
+    radial-gradient(ellipse 28px 18px at 8% 88%, #2a1c00 0%, #4a3200 40%, transparent 68%),
+    /* Mancha de roce centro-arriba */
+    radial-gradient(ellipse 18px 6px at 52% 5%, rgba(0,0,0,0.45) 0%, transparent 80%),
+    /* Rayón diagonal largo */
+    linear-gradient(
+      128deg,
+      transparent 0%,
+      transparent 28%,
+      rgba(0,0,0,0.18) 28.5%,
+      rgba(0,0,0,0.06) 29%,
+      transparent 29.5%,
+      transparent 52%,
+      rgba(0,0,0,0.12) 52.4%,
+      transparent 52.8%,
+      transparent 100%
+    ),
+    /* Desgaste vertical en borde izquierdo */
+    linear-gradient(
+      90deg,
+      rgba(0,0,0,0.3) 0%,
+      rgba(0,0,0,0.12) 3%,
+      transparent 8%
+    ),
+    /* Desgaste en borde inferior */
+    linear-gradient(
+      0deg,
+      rgba(0,0,0,0.25) 0%,
+      rgba(0,0,0,0.08) 4%,
+      transparent 9%
+    ),
+    /* Textura de líneas finas (pintura original) */
+    repeating-linear-gradient(
+      92deg,
+      transparent,
+      transparent 4px,
+      rgba(0,0,0,0.03) 4px,
+      rgba(0,0,0,0.03) 5px
+    );
+}
+
+/* Brillo/reflejo metálico donde saltó la pintura */
+.pedal-body::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  pointer-events: none;
+  z-index: 2;
+  background:
+    /* Reflejo metálico en chip superior izquierdo */
+    radial-gradient(ellipse 10px 6px at 15% 6%, rgba(180,160,120,0.35) 0%, transparent 100%),
+    /* Reflejo en chip derecho */
+    radial-gradient(ellipse 7px 10px at 96% 36%, rgba(160,140,100,0.28) 0%, transparent 100%),
+    /* Reflejo inferior derecho */
+    radial-gradient(ellipse 8px 5px at 90% 93%, rgba(170,150,110,0.3) 0%, transparent 100%),
+    /* Brillo general superior (desgaste de uso) */
+    linear-gradient(
+      180deg,
+      rgba(255,200,80,0.06) 0%,
+      transparent 25%
+    );
 }
 
 /* Panel de control superior (negro) */

@@ -7,108 +7,104 @@ const NOISE_LINES = [
   '> SNR: -42 dB  [CRÍTICO]',
   '> BUSCANDO SEÑAL...',
   '> ERR: SRC_NOT_FOUND',
-  '> REINTENTANDO... [  ]',
 ]
 
 function randomChar() {
   return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)]
 }
-
 function glitchString(str, amount = 0.3) {
-  return str.split('').map(c =>
-    Math.random() < amount ? randomChar() : c
-  ).join('')
+  return str.split('').map(c => Math.random() < amount ? randomChar() : c).join('')
 }
 
-// Estado: 'noise' | 'lock' | 'reboot' | 'revealed'
 export default function LCDScreen({ phase, signalStrength }) {
-  const [lines, setLines] = useState(NOISE_LINES)
-  const [cursor, setCursor] = useState(true)
+  const [lines, setLines]     = useState(NOISE_LINES)
+  const [cursor, setCursor]   = useState(true)
   const [snrValue, setSnrValue] = useState(-42)
+  const [targetBlink, setTargetBlink] = useState(true)
   const intervalRef = useRef(null)
 
-  // Cursor blink
   useEffect(() => {
     const id = setInterval(() => setCursor(c => !c), 530)
     return () => clearInterval(id)
   }, [])
 
-  // Glitch loop en fase 'noise'
+  // Parpadeo de la línea de objetivo (llama la atención)
+  useEffect(() => {
+    if (phase !== 'noise') return
+    const id = setInterval(() => setTargetBlink(b => !b), 900)
+    return () => clearInterval(id)
+  }, [phase])
+
   useEffect(() => {
     if (phase !== 'noise' && phase !== 'lock') {
       clearInterval(intervalRef.current)
       return
     }
     intervalRef.current = setInterval(() => {
-      const glitchAmt = phase === 'lock' ? 0.05 : 0.22
+      const glitchAmt = phase === 'lock' ? 0.04 : 0.2
       setLines(NOISE_LINES.map(l => glitchString(l, glitchAmt)))
-      const newSnr = Math.round(-42 + signalStrength * 42)
-      setSnrValue(newSnr)
-    }, phase === 'lock' ? 180 : 80)
+      setSnrValue(Math.round(-42 + signalStrength * 42))
+    }, phase === 'lock' ? 200 : 90)
     return () => clearInterval(intervalRef.current)
   }, [phase, signalStrength])
 
   const snrColor =
-    snrValue > -5 ? '#00ff41' :
+    snrValue > -5  ? '#00ff41' :
     snrValue > -20 ? '#aaff00' :
     snrValue > -35 ? '#ffaa00' : '#ff4400'
 
+  /* ---- REBOOT ---- */
   if (phase === 'reboot') {
     return (
-      <div className="lcd-screen rounded-lg p-4 w-full h-full flex items-center justify-center reboot-anim">
-        <div className="lcd-text text-2xl text-center tracking-widest" style={{ fontFamily: "'VT323', monospace" }}>
+      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        className="reboot-anim">
+        <div className="lcd-text" style={{ fontFamily: "'VT323', monospace", fontSize: '22px', textAlign: 'center', lineHeight: 1.4 }}>
           [  REBOOTING  ]<br />
-          <span className="text-lg">▓▓▓▓▓▓▓▓▓▓</span><br />
-          <span className="text-base lcd-dim">SIG_LOCK CONFIRMED</span>
+          <span style={{ fontSize: '18px' }}>▓▓▓▓▓▓▓▓▓▓</span><br />
+          <span className="lcd-dim" style={{ fontSize: '16px' }}>SIG_LOCK CONFIRMED</span>
         </div>
       </div>
     )
   }
 
+  /* ---- REVEALED ---- */
   if (phase === 'revealed') {
     return (
-      <div className="lcd-screen rounded-lg p-4 w-full h-full flex flex-col items-center justify-center gap-2">
-        {/* Nombre de la banda */}
-        <div
-          className="lcd-text text-4xl tracking-widest text-center reveal-anim"
-          style={{ fontFamily: "'VT323', monospace", animationDelay: '0.05s', opacity: 0 }}
-        >
+      <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '8px' }}>
+        <div className="lcd-text reveal-anim" style={{ fontFamily: "'VT323', monospace", fontSize: '38px', letterSpacing: '0.15em', textAlign: 'center', opacity: 0, animationDelay: '0.05s' }}>
           ARIAL BLACK
         </div>
-        <div
-          className="lcd-dim text-sm tracking-widest text-center reveal-anim"
-          style={{ fontFamily: "'Share Tech Mono', monospace", animationDelay: '0.3s', opacity: 0 }}
-        >
+        <div className="lcd-dim reveal-anim" style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: '10px', letterSpacing: '0.25em', textAlign: 'center', opacity: 0, animationDelay: '0.3s' }}>
           ── PRIMER SHOW ──
         </div>
-        <div
-          className="lcd-text text-2xl tracking-wide text-center reveal-anim"
-          style={{ fontFamily: "'VT323', monospace", animationDelay: '0.55s', opacity: 0 }}
-        >
+        <div className="lcd-text reveal-anim" style={{ fontFamily: "'VT323', monospace", fontSize: '26px', letterSpacing: '0.1em', textAlign: 'center', opacity: 0, animationDelay: '0.55s' }}>
           15 · AGO · 2025
         </div>
-        <div
-          className="lcd-text text-xl text-center reveal-anim"
-          style={{ fontFamily: "'VT323', monospace", animationDelay: '0.8s', opacity: 0 }}
-        >
+        <div className="lcd-text reveal-anim" style={{ fontFamily: "'VT323', monospace", fontSize: '20px', textAlign: 'center', opacity: 0, animationDelay: '0.8s' }}>
           NICETO CLUB<br />
-          <span className="text-base lcd-dim">Bs. As. · 21:00 hs</span>
+          <span className="lcd-dim" style={{ fontSize: '16px' }}>Bs. As. · 21:00 hs</span>
         </div>
         <a
-          href="https://instagram.com"
+          href="https://instagram.com/arialblack"
           target="_blank"
           rel="noopener noreferrer"
-          className="reveal-anim mt-2 px-5 py-2 rounded border text-sm tracking-widest uppercase font-bold"
+          className="reveal-anim"
           style={{
-            borderColor: '#00ff41',
+            marginTop: '4px',
+            padding: '5px 16px',
+            borderRadius: '4px',
+            border: '1px solid #00ff41',
             color: '#00ff41',
             background: 'rgba(0,255,65,0.08)',
             fontFamily: "'Share Tech Mono', monospace",
+            fontSize: '11px',
+            letterSpacing: '0.2em',
+            textTransform: 'uppercase',
             boxShadow: '0 0 10px rgba(0,255,65,0.2)',
-            animationDelay: '1.1s',
             opacity: 0,
-            WebkitTapHighlightColor: 'transparent',
+            animationDelay: '1.1s',
             textDecoration: 'none',
+            WebkitTapHighlightColor: 'transparent',
           }}
         >
           ▶ @ARIALBLACK
@@ -117,61 +113,93 @@ export default function LCDScreen({ phase, signalStrength }) {
     )
   }
 
-  // Fase noise / lock
+  /* ---- NOISE / LOCK ---- */
   return (
-    <div className="lcd-screen rounded-lg p-3 w-full h-full flex flex-col justify-between overflow-hidden">
+    <div style={{
+      width: '100%', height: '100%',
+      display: 'flex', flexDirection: 'column',
+      justifyContent: 'space-between',
+      padding: '10px 10px 8px',
+      overflow: 'hidden',
+    }}>
       {/* Header */}
-      <div className="flex justify-between items-center mb-1">
-        <span className="lcd-text text-sm" style={{ fontFamily: "'VT323', monospace" }}>
-          SIG_PROC
-        </span>
-        <span className="text-xs" style={{ color: snrColor, fontFamily: "'Share Tech Mono', monospace", textShadow: `0 0 4px ${snrColor}` }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+        <span className="lcd-text" style={{ fontFamily: "'VT323', monospace", fontSize: '16px' }}>SIG_PROC</span>
+        <span style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: '10px', color: snrColor, textShadow: `0 0 4px ${snrColor}` }}>
           SNR {snrValue >= 0 ? '+' : ''}{snrValue} dB
         </span>
       </div>
 
-      {/* Líneas de texto con glitch */}
-      <div className="flex-1 flex flex-col gap-0.5 overflow-hidden">
+      {/* Líneas glitch */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1px', overflow: 'hidden' }}>
         {lines.map((line, i) => (
-          <div
-            key={i}
-            className="text-[11px] truncate"
-            style={{
-              fontFamily: "'VT323', monospace",
-              color: i === lines.length - 1 ? '#00ff41' : 'rgba(0,255,65,0.55)',
-              textShadow: i === lines.length - 1 ? '0 0 6px rgba(0,255,65,0.8)' : 'none',
-              fontSize: '13px',
-            }}
-          >
+          <div key={i} style={{
+            fontFamily: "'VT323', monospace",
+            fontSize: '13px',
+            color: i === lines.length - 1 ? '#00ff41' : 'rgba(0,255,65,0.5)',
+            textShadow: i === lines.length - 1 ? '0 0 6px rgba(0,255,65,0.8)' : 'none',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+          }}>
             {line}
           </div>
         ))}
       </div>
 
-      {/* Signal bar */}
-      <div className="mt-2">
-        <div className="flex justify-between text-[10px] mb-0.5 lcd-dim" style={{ fontFamily: "'Share Tech Mono', monospace" }}>
+      {/* ▼ OBJETIVO — línea fija prominente ▼ */}
+      <div style={{
+        margin: '6px 0 4px',
+        padding: '5px 8px',
+        border: `1px solid ${phase === 'lock' ? '#00ff41' : targetBlink ? 'rgba(0,255,65,0.7)' : 'rgba(0,255,65,0.2)'}`,
+        borderRadius: '3px',
+        background: phase === 'lock' ? 'rgba(0,255,65,0.1)' : 'rgba(0,0,0,0.3)',
+        transition: 'border-color 0.3s, background 0.3s',
+      }}>
+        <div style={{
+          fontFamily: "'Share Tech Mono', monospace",
+          fontSize: '9px',
+          color: 'rgba(0,255,65,0.5)',
+          letterSpacing: '0.15em',
+          marginBottom: '2px',
+        }}>
+          OBJETIVO:
+        </div>
+        <div style={{
+          fontFamily: "'VT323', monospace",
+          fontSize: '18px',
+          color: phase === 'lock' ? '#00ff41' : targetBlink ? '#00ff41' : 'rgba(0,255,65,0.5)',
+          textShadow: phase === 'lock' ? '0 0 8px rgba(0,255,65,1)' : targetBlink ? '0 0 6px rgba(0,255,65,0.8)' : 'none',
+          letterSpacing: '0.05em',
+          lineHeight: 1,
+          transition: 'color 0.3s',
+        }}>
+          FREQ: 70% · GAIN: 30%
+        </div>
+      </div>
+
+      {/* Barra de señal */}
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: "'Share Tech Mono', monospace", fontSize: '9px', marginBottom: '3px', color: '#007a20' }}>
           <span>NIVEL DE SEÑAL</span>
           <span>{Math.round(signalStrength * 100)}%</span>
         </div>
-        <div className="h-2 rounded-sm overflow-hidden" style={{ background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(0,255,65,0.2)' }}>
-          <div
-            className="h-full rounded-sm transition-all duration-100"
-            style={{
-              width: `${signalStrength * 100}%`,
-              background: signalStrength > 0.8
-                ? 'linear-gradient(90deg, #00ff41, #00ff99)'
-                : signalStrength > 0.4
-                  ? 'linear-gradient(90deg, #aaff00, #00ff41)'
-                  : 'linear-gradient(90deg, #ff4400, #ffaa00)',
-              boxShadow: `0 0 6px rgba(0,255,65,${signalStrength})`,
-            }}
-          />
+        <div style={{ height: '6px', borderRadius: '2px', overflow: 'hidden', background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(0,255,65,0.15)' }}>
+          <div style={{
+            height: '100%',
+            width: `${signalStrength * 100}%`,
+            background: signalStrength > 0.8
+              ? 'linear-gradient(90deg, #00ff41, #00ff99)'
+              : signalStrength > 0.4
+                ? 'linear-gradient(90deg, #aaff00, #00ff41)'
+                : 'linear-gradient(90deg, #ff4400, #ffaa00)',
+            boxShadow: `0 0 6px rgba(0,255,65,${signalStrength})`,
+            transition: 'width 0.1s linear',
+          }} />
         </div>
       </div>
 
       {/* Cursor */}
-      <div className="mt-1 lcd-text text-sm" style={{ fontFamily: "'VT323', monospace" }}>
+      <div className="lcd-text" style={{ fontFamily: "'VT323', monospace", fontSize: '14px', marginTop: '2px', height: '14px' }}>
         {cursor ? '█' : ' '}
       </div>
     </div>

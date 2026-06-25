@@ -314,23 +314,9 @@ export default function App() {
         </div>
       </div>
 
-      {/* Instrucción flotante */}
-      {phase === 'noise' && (
-        <div style={{
-          position: 'fixed', bottom: '20px', left: 0, right: 0,
-          textAlign: 'center',
-          fontFamily: "'Share Tech Mono', monospace",
-          fontSize: '9px',
-          letterSpacing: '0.2em',
-          color: 'rgba(0,255,65,0.35)',
-        }}>
-          AJUSTÁ FREQ → 70% · GAIN → 30%
-        </div>
-      )}
-
       {phase === 'lock' && (
         <div style={{
-          position: 'fixed', bottom: '20px', left: 0, right: 0,
+          position: 'fixed', bottom: '16px', left: 0, right: 0,
           textAlign: 'center',
           fontFamily: "'Share Tech Mono', monospace",
           fontSize: '9px',
